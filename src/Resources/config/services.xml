@@ -9,7 +9,10 @@
         <service id="SwagSmartComparer\Command\ExampleCommand">
             <tag name="console.command"/>
         </service>
-        <service id="SwagSmartCompare\Storefront\Controller\CompareController" public="true">
+        <service id="SwagSmartComparer\Storefront\Controller\CompareController" public="true">
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
             <argument type="service" id="product.repository"/>
             <tag name="controller.service_arguments"/>
         </service>
