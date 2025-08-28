@@ -1,0 +1,10 @@
+{% sw_extends '@Storefront/storefront/component/buy-widget/buy-widget-form.html.twig' %}
+
+{% block buy_widget_buy_form_inner %}
+    {{ parent() }}
+    <form method="post" action="{{ path('frontend.smc.compare.add', { productId: page.product.id }) }}">
+        <button type="submit" class="btn btn-outline-primary mt-2">
+            {{ "smart-comparer.addToCompare"|trans }}
+        </button>
+    </form>
+{% endblock %}

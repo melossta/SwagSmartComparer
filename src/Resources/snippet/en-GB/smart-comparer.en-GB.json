@@ -1,0 +1,25 @@
+{
+  "smart-comparer": {
+    "addToCompare": "Compare It",
+    "compare": {
+      "title": "Product Comparison",
+      "productsCount": "product(s)",
+      "empty": {
+        "title": "No products to compare",
+        "text": "Add some products to start comparing features and prices.",
+        "cta": "Continue Shopping"
+      },
+      "properties": "Properties",
+      "manufacturer": "Manufacturer",
+      "availability": "Availability",
+      "inStock": "In Stock",
+      "outOfStock": "Out of Stock",
+      "productNumber": "Product Number",
+      "viewProduct": "View Product",
+      "remove": "Remove from comparison",
+      "noPrice": "No price",
+      "continueShopping": "Continue Shopping",
+      "print": "Print Comparison"
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{% sw_extends '@Storefront/storefront/component/product/card/box-standard.html.twig' %}
+
+{% block component_product_box_action %}
+    {{ parent() }}
+
+    <div class="product-compare mt-2">
+        <form method="post" action="{{ path('frontend.smc.compare.add', { productId: product.id }) }}">
+            <button type="submit" class="btn btn-outline-primary btn-sm">
+                {{ "smart-comparer.addToCompare"|trans }}
+            </button>
+        </form>
+    </div>
+{% endblock %}

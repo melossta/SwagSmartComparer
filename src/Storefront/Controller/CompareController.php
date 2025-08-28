@@ -33,8 +33,14 @@ class CompareController extends StorefrontController
         if (!empty($ids)) {
             $criteria = (new Criteria($ids))
                 ->addAssociation('manufacturer')
-                ->addAssociation('cover')
-                ->addAssociation('properties.group');
+                ->addAssociation('cover.media')
+                ->addAssociation('properties.group')
+                ->addAssociation('currency')
+                        ->addAssociation('prices') // Add price association
+            ->addAssociation('calculatedPrice'); // Add calculated price association
+            ;
+
+
 
             $products = $this->productRepository->search($criteria, $context->getContext())->getEntities();
         }

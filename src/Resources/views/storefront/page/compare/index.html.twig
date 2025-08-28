@@ -1,34 +1,184 @@
 {% sw_extends '@Storefront/storefront/base.html.twig' %}
 
-{% block base_content %}
-    <h1>Compare Page</h1>
+{% block base_main %}
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-10">
+                {% block page_compare_content %}
+                    <div class="compare-page">
 
-    {% if products is empty %}
-        <p>No products in compare list.</p>
-    {% else %}
-        <table class="table table-bordered">
-            <thead>
-            <tr>
-                <th>Property</th>
-                {% for product in products %}
-                    <th>{{ product.translated.name }}</th>
-                {% endfor %}
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>Price</td>
-                {% for product in products %}
-                    <td>{{ product.calculatedPrice.unitPrice|currency }}</td>
-                {% endfor %}
-            </tr>
-            <tr>
-                <td>Manufacturer</td>
-                {% for product in products %}
-                    <td>{{ product.manufacturer.translated.name ?? '-' }}</td>
-                {% endfor %}
-            </tr>
-            </tbody>
-        </table>
-    {% endif %}
+                        {# Header Section #}
+                        <div class="d-flex justify-content-between align-items-center mb-5">
+                            <h1 class="h2 mb-0 text-primary">
+                                {% sw_icon 'scale-balanced' style { 'size': 'sm', 'pack': 'solid' } %}
+                                {{ "smart-comparer.compare.title"|trans|sw_sanitize }}
+                            </h1>
+                            {% if products is not empty %}
+                                <span class="badge bg-primary fs-6 px-3 py-2">
+                                    {{ products|length }} {{ "smart-comparer.compare.productsCount"|trans|sw_sanitize }}
+                                </span>
+                            {% endif %}
+                        </div>
+
+                        {% if products is empty %}
+                            {# Empty State #}
+                            <div class="text-center py-5">
+                                <div class="mb-4">
+                                    {% sw_icon 'search' style { 'size': 'xl', 'pack': 'solid', 'class': 'text-muted' } %}
+                                </div>
+                                <h3 class="h4 text-muted mb-3">{{ "smart-comparer.compare.empty.title"|trans|sw_sanitize }}</h3>
+                                <p class="text-muted mb-4">{{ "smart-comparer.compare.empty.text"|trans|sw_sanitize }}</p>
+                                <a href="{{ path('frontend.home.page') }}" class="btn btn-primary">
+                                    {% sw_icon 'shopping-bag' style { 'size': 'sm', 'pack': 'solid' } %}
+                                    {{ "smart-comparer.compare.empty.cta"|trans|sw_sanitize }}
+                                </a>
+                            </div>
+                        {% else %}
+                            {# Comparison Table #}
+                            <div class="card shadow-sm border-0">
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-compare mb-0">
+                                            <thead class="bg-light">
+                                            <tr>
+                                                <th class="border-0 ps-4" style="width: 200px;">
+                                                    <span class="text-muted fw-normal">{{ "smart-comparer.compare.properties"|trans|sw_sanitize }}</span>
+                                                </th>
+                                                {% for product in products %}
+                                                    <th class="border-0 text-center position-relative" style="min-width: 180px;">
+                                                        <div class="d-flex flex-column align-items-center p-3">
+
+                                                            {# Product Image #}
+                                                            {% if product.cover and product.cover.media %}
+                                                                {% sw_thumbnails 'product-image-thumbnails' with {
+                                                                    media: product.cover.media,
+                                                                    sizes: { 'default': '200px' },
+                                                                    attributes: {
+                                                                        'class': 'img-fluid rounded mb-3',
+                                                                        'alt': product.translated.name,
+                                                                        'title': product.translated.name,
+                                                                        'style': 'height: 120px; object-fit: contain;'
+                                                                    }
+                                                                } %}
+                                                            {% else %}
+                                                                <div class="bg-light rounded d-flex align-items-center justify-content-center mb-3"
+                                                                     style="height: 120px; width: 120px;">
+                                                                    {% sw_icon 'image' style { 'size': 'lg', 'pack': 'regular', 'class': 'text-muted' } %}
+                                                                </div>
+                                                            {% endif %}
+
+                                                            {# Product Name #}
+                                                            <h6 class="fw-bold text-dark mb-2 text-center">
+                                                                {{ product.translated.name }}
+                                                            </h6>
+
+                                                            {# Product Price - YOUR RAW VERSION #}
+                                                            <div class="text-success fw-bold fs-5 mb-3">
+                                                                {% set rawPrice = product.price.first() %}
+                                                                {% if rawPrice %}
+                                                                    <p class="product-price">{{ rawPrice.gross|currency }}</p>
+                                                                {% else %}
+                                                                    <p class="product-price">{{ "smart-comparer.compare.noPrice"|trans|sw_sanitize }}</p>
+                                                                {% endif %}
+                                                            </div>
+
+                                                            {# Remove Button #}
+                                                            <form method="post"
+                                                                  action="{{ path('frontend.smc.compare.remove', { productId: product.id }) }}"
+                                                                  class="position-absolute top-0 end-0 mt-2 me-2">
+                                                                <input type="hidden" name="_csrf_token" value="{{ csrf_token('frontend.smc.compare.remove') }}">
+                                                                <button type="submit"
+                                                                        class="btn btn-sm btn-outline-primary p-0 fw-bold"
+                                                                        title="{{ "smart-comparer.compare.remove"|trans|sw_sanitize }}"
+                                                                        style="width: 28px; height: 28px; border-radius: 4px; line-height: 1; font-size: 18px;">
+                                                                    ×
+                                                                </button>
+                                                            </form>
+
+                                                            {# View Product Button #}
+                                                            <a href="{{ seoUrl('frontend.detail.page', { productId: product.id }) }}"
+                                                               class="btn btn-outline-primary btn-sm">
+                                                                {% sw_icon 'eye' style { 'size': 'sm', 'pack': 'solid' } %}
+                                                                {{ "smart-comparer.compare.viewProduct"|trans|sw_sanitize }}
+                                                            </a>
+                                                        </div>
+                                                    </th>
+                                                {% endfor %}
+                                            </tr>
+                                            </thead>
+
+                                            <tbody>
+                                            {# Manufacturer Row #}
+                                            <tr>
+                                                <td class="ps-4 fw-semibold">{{ "smart-comparer.compare.manufacturer"|trans|sw_sanitize }}</td>
+                                                {% for product in products %}
+                                                    <td class="text-center">
+                                                        {{ product.manufacturer.translated.name ?? '-' }}
+                                                    </td>
+                                                {% endfor %}
+                                            </tr>
+
+                                            {# Properties Rows #}
+                                            {% if products|first.properties is defined %}
+                                                {% for property in products|first.properties %}
+                                                    <tr>
+                                                        <td class="ps-4 fw-semibold {% if loop.index0 % 2 == 0 %}bg-light{% endif %}">
+                                                            {{ property.group.translated.name }}
+                                                        </td>
+                                                        {% for product in products %}
+                                                            <td class="text-center {% if loop.parent.loop.index0 % 2 == 0 %}bg-light{% endif %}">
+                                                                {% set productProperty = product.properties|filter(p => p.groupId == property.groupId)|first %}
+                                                                {{ productProperty.translated.name ?? '-' }}
+                                                            </td>
+                                                        {% endfor %}
+                                                    </tr>
+                                                {% endfor %}
+                                            {% endif %}
+
+                                            {# Stock Availability #}
+                                            <tr class="border-top">
+                                                <td class="ps-4 fw-semibold">{{ "smart-comparer.compare.availability"|trans|sw_sanitize }}</td>
+                                                {% for product in products %}
+                                                    <td class="text-center">
+                                                        {% if product.available %}
+                                                            <span class="badge bg-success">{{ "smart-comparer.compare.inStock"|trans|sw_sanitize }}</span>
+                                                        {% else %}
+                                                            <span class="badge bg-danger">{{ "smart-comparer.compare.outOfStock"|trans|sw_sanitize }}</span>
+                                                        {% endif %}
+                                                    </td>
+                                                {% endfor %}
+                                            </tr>
+
+                                            {# Product Number #}
+                                            <tr>
+                                                <td class="ps-4 fw-semibold bg-light">{{ "smart-comparer.compare.productNumber"|trans|sw_sanitize }}</td>
+                                                {% for product in products %}
+                                                    <td class="text-center bg-light">
+                                                        {{ product.productNumber }}
+                                                    </td>
+                                                {% endfor %}
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {# Action Buttons #}
+                            <div class="d-flex gap-3 mt-4">
+                                <a href="{{ path('frontend.home.page') }}" class="btn btn-outline-secondary">
+                                    {% sw_icon 'arrow-left' style { 'size': 'sm', 'pack': 'solid' } %}
+                                    {{ "smart-comparer.compare.continueShopping"|trans|sw_sanitize }}
+                                </a>
+                                <button onclick="window.print()" class="btn btn-outline-primary">
+                                    {% sw_icon 'print' style { 'size': 'sm', 'pack': 'solid' } %}
+                                    {{ "smart-comparer.compare.print"|trans|sw_sanitize }}
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endblock %}
+            </div>
+        </div>
+    </div>
 {% endblock %}
