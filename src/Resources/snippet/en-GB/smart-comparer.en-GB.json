@@ -19,7 +19,9 @@
       "remove": "Remove from comparison",
       "noPrice": "No price",
       "continueShopping": "Continue Shopping",
-      "print": "Print Comparison"
+      "print": "Print Comparison",
+      "selectPlaceholder": "Search for Products",
+      "addProductButton": "Add Product"
     }
   }
 }

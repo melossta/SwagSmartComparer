@@ -4,8 +4,12 @@ namespace SwagSmartComparer\Storefront\Controller;
 
 use Shopware\Core\Framework\DataAbstractionLayer\EntityRepository;
 use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\ContainsFilter;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
 use Shopware\Core\System\SalesChannel\SalesChannelContext;
 use Shopware\Storefront\Controller\StorefrontController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -44,9 +48,15 @@ class CompareController extends StorefrontController
 
             $products = $this->productRepository->search($criteria, $context->getContext())->getEntities();
         }
+        $dropdownCriteria = (new Criteria())
+            ->addAssociation('cover.media')
+            ->addFilter(new EqualsFilter('active', true))
+            ->setLimit(50);
 
+        $dropdownProducts = $this->productRepository->search($dropdownCriteria, $context->getContext())->getEntities();
         return $this->renderStorefront('@Storefront/storefront/page/compare/index.html.twig', [
             'products' => $products,
+            'dropdownProducts'=>$dropdownProducts,
         ]);
     }
 
@@ -75,5 +85,35 @@ class CompareController extends StorefrontController
         $session->set('smc_compare', $ids);
 
         return $this->redirectToRoute('frontend.smc.compare.page');
+    }
+
+
+    /**
+     * AJAX Search for Compare Page
+     */
+    #[Route(path: '/compare/search', name: 'frontend.smc.compare.search', methods: ['GET'])]
+    public function searchProducts(Request $request, SalesChannelContext $context): JsonResponse
+    {
+        $query = trim((string)$request->query->get('q', ''));
+        if ($query === '') {
+            return new JsonResponse([]);
+        }
+
+        $criteria = (new Criteria())
+            ->addFilter(new ContainsFilter('translations.name', $query))
+            ->setLimit(10);
+
+        $products = $this->productRepository->search($criteria, $context->getContext())->getEntities();
+
+        $results = [];
+        foreach ($products as $product) {
+            $results[] = [
+                'id' => $product->getId(),
+                'name' => $product->getTranslated()['name'],
+                'productNumber' => $product->getProductNumber(),
+            ];
+        }
+
+        return new JsonResponse($results);
     }
 }

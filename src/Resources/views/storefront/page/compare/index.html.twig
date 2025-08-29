@@ -5,8 +5,33 @@
         <div class="row justify-content-center">
             <div class="col-12 col-lg-10">
                 {% block page_compare_content %}
-                    <div class="compare-page">
+                    <div class="compare-page"
+                         id="compare-container"
+                         data-search-url="{{ path('frontend.smc.compare.search') }}"
+                         data-add-url="{{ path('frontend.smc.compare.add', { productId: 'REPLACE' }) }}">
+                        <div class="compare-add-product mb-4">
+                            <form id="compare-add-form" class="row g-2" method="post">
+                                <input type="hidden" name="_csrf_token" value="{{ csrf_token('frontend.smc.compare.add') }}">
 
+                                <div class="col-12 col-md position-relative">
+                                    <input
+                                            type="text"
+                                            id="compare-search"
+                                            class="form-control"
+                                            placeholder="{{ 'smart-comparer.compare.selectPlaceholder'|trans }}"
+                                            autocomplete="off"
+                                    >
+                                    <input type="hidden" id="compare-select" name="productId">
+                                    <div id="compare-suggestions" class="list-group position-absolute w-100" style="z-index: 1000;"></div>
+                                </div>
+
+                                <div class="col-12 col-md-auto">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        {{ "smart-comparer.compare.addProductButton"|trans }}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                         {# Header Section #}
                         <div class="d-flex justify-content-between align-items-center mb-5">
                             <h1 class="h2 mb-0 text-primary">
@@ -177,8 +202,10 @@
                             </div>
                         {% endif %}
                     </div>
+
                 {% endblock %}
             </div>
         </div>
     </div>
 {% endblock %}
+
